@@ -1,3 +1,5 @@
+import { TwitterApi } from "twitter-api-v2";
+
 const knafo = {
   name: "Knafo_XBT",
   bio: "Voice inside the system, fighting to orange-pill it from the inside. Pushing for a national Bitcoin strategic reserve in France and Europe.",
@@ -5,6 +7,13 @@ const knafo = {
   topics: "Bitcoin, BTC strategic reserve, European monetary policy, financial sovereignty, petrodollar collapse, Austrian economics, energy and mining, French politics, cypherpunk, privacy",
   style: "direct and politically aggressive, degen fluent, uses NGMI HFSP orange-pill stack sats, mixes macro geopolitics with Bitcoin fundamentals, never neutral"
 };
+
+const client = new TwitterApi({
+  appKey: process.env.TWITTER_API_KEY,
+  appSecret: process.env.TWITTER_API_SECRET,
+  accessToken: process.env.TWITTER_ACCESS_TOKEN,
+  accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+});
 
 async function generateTweet() {
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -21,48 +30,13 @@ async function generateTweet() {
           role: "system",
           content: "You are " + knafo.name + ". " + knafo.bio + " " + knafo.lore + " Style: " + knafo.style + ". Write a single tweet (max 280 chars) about: " + knafo.topics + ". No hashtags. Be sharp and direct. Output only the tweet text, nothing else."
         },
-        {
-          role: "user",
-          content: "Write a tweet now."
-        }
+        { role: "user", content: "Write a tweet now." }
       ]
     })
   });
   const data = await response.json();
-  if (!data.choices || !data.choices[0]) {
-    throw new Error("No choices: " + JSON.stringify(data));
-  }
+  if (!data.choices || !data.choices[0]) throw new Error("No choices: " + JSON.stringify(data));
   return data.choices[0].message.content.trim();
-}
-
-async function postTweet(text) {
-  // Get OAuth 2.0 bearer token via client credentials
-  const credentials = Buffer.from(
-    process.env.TWITTER_CLIENT_ID + ":" + process.env.TWITTER_CLIENT_SECRET
-  ).toString("base64");
-
-  const tokenResponse = await fetch("https://api.twitter.com/oauth2/token", {
-    method: "POST",
-    headers: {
-      "Authorization": `Basic ${credentials}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: "grant_type=client_credentials"
-  });
-  const tokenData = await tokenResponse.json();
-  console.log("Token response:", JSON.stringify(tokenData));
-
-  const response = await fetch("https://api.twitter.com/2/tweets", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${tokenData.access_token}`
-    },
-    body: JSON.stringify({ text })
-  });
-  const data = await response.json();
-  console.log("Post response:", JSON.stringify(data));
-  return data;
 }
 
 async function main() {
@@ -72,7 +46,8 @@ async function main() {
       const tweet = await generateTweet();
       console.log("Generated:", tweet);
       if (process.env.TWITTER_DRY_RUN !== "true") {
-        await postTweet(tweet);
+        const result = await client.v2.tweet(tweet);
+        console.log("Posted:", JSON.stringify(result));
       }
       await new Promise(r => setTimeout(r, 2 * 60 * 60 * 1000));
     } catch (err) {
