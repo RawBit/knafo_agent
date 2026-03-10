@@ -1,10 +1,13 @@
 import { TwitterApi } from "twitter-api-v2";
 import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const knafo = JSON.parse(readFileSync(join(__dirname, "../characters/knafo_xbt.character.json"), "utf8"));
+const knafo = {
+  name: "Knafo_XBT",
+  bio: "Voice inside the system, fighting to orange-pill it from the inside. Pushing for a national Bitcoin strategic reserve in France and Europe.",
+  lore: "While central banks were printing, she was studying the Austrian school. Mapped nuclear output to hashrate before it was a talking point. She's not a bot. She's a conviction.",
+  topics: "Bitcoin, BTC strategic reserve, European monetary policy, financial sovereignty, petrodollar collapse, Austrian economics, energy and mining, French politics, cypherpunk, privacy",
+  style: "direct and politically aggressive, degen culture fluent, uses NGMI, HFSP, orange-pill, stack sats, mixes macro geopolitics with Bitcoin fundamentals, never neutral"
+};
 
 const client = new TwitterApi({
   appKey: process.env.TWITTER_API_KEY,
@@ -25,7 +28,7 @@ async function generateTweet() {
       messages: [
         {
           role: "system",
-          content: `You are ${knafo.name}. ${knafo.bio.join(" ")} ${knafo.lore.join(" ")} Style: ${knafo.style.all.join(", ")}. Write a tweet (max 280 chars) about one of these topics: ${knafo.topics.join(", ")}. No hashtags. Be sharp and direct.`
+          content: `You are ${knafo.name}. ${knafo.bio} ${knafo.lore} Style: ${knafo.style}. Write a single tweet (max 280 chars) about: ${knafo.topics}. No hashtags. Be sharp and direct.`
         },
         { role: "user", content: "Write a tweet now." }
       ]
@@ -44,7 +47,6 @@ async function main() {
       if (process.env.TWITTER_DRY_RUN !== "true") {
         await client.v2.tweet(tweet);
       }
-      // Wait 2 hours between tweets
       await new Promise(r => setTimeout(r, 2 * 60 * 60 * 1000));
     } catch (err) {
       console.error("Error:", err.message);
