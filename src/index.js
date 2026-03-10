@@ -36,15 +36,27 @@ async function generateTweet() {
 }
 
 async function postTweet(text) {
+  // Get OAuth 2.0 bearer token via client credentials
+  const credentials = Buffer.from(
+    process.env.TWITTER_CLIENT_ID + ":" + process.env.TWITTER_CLIENT_SECRET
+  ).toString("base64");
+
+  const tokenResponse = await fetch("https://api.twitter.com/oauth2/token", {
+    method: "POST",
+    headers: {
+      "Authorization": `Basic ${credentials}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "grant_type=client_credentials"
+  });
+  const tokenData = await tokenResponse.json();
+  console.log("Token response:", JSON.stringify(tokenData));
+
   const response = await fetch("https://api.twitter.com/2/tweets", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Cookie": `auth_token=${process.env.X_AUTH_TOKEN}; ct0=${process.env.X_CT0}`,
-      "X-Csrf-Token": process.env.X_CT0,
-      "Authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
-      "User-Agent": "Mozilla/5.0",
-      "Referer": "https://x.com"
+      "Authorization": `Bearer ${tokenData.access_token}`
     },
     body: JSON.stringify({ text })
   });
