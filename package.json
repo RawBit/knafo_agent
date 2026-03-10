@@ -1,0 +1,12 @@
+{
+  "name": "knafo-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@elizaos/core": "^1.0.0",
+    "@elizaos/plugin-twitter": "^1.0.0"
+  }
+}
