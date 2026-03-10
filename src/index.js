@@ -1,0 +1,12 @@
+import { AgentRuntime, ModelProviderName } from "@elizaos/core";
+import { TwitterClientInterface } from "@elizaos/plugin-twitter";
+import knafo from "../characters/knafo_xbt.character.json" assert { type: "json" };
+
+const runtime = new AgentRuntime({
+  character: knafo,
+  modelProvider: ModelProviderName.OPENROUTER,
+  token: process.env.OPENROUTER_API_KEY,
+});
+
+const twitter = await TwitterClientInterface.start(runtime);
+console.log("Knafo_XBT is live 🐾");
