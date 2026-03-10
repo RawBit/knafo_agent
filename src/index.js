@@ -21,8 +21,27 @@ async function generateTweet() {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://knafo.fun"
     },
+    body: JSON.stringify({
+      model: "mistralai/mistral-7b-instruct",
+      messages: [
+        {
+          role: "system",
+          content: `You are ${knafo.name}. ${knafo.bio} Style: ${knafo.style}. Write a single tweet (max 280 chars) about: ${knafo.topics}. No hashtags. Be sharp and direct.`
+        },
+        { role: "user", content: "Write a tweet now." }
+      ]
+    })
+  });
+  const data = await response.json();
+  console.log("OpenRouter response:", JSON.stringify(data));
+  if (!data.choices || !data.choices[0]) {
+    throw new Error("No choices in response: " + JSON.stringify(data));
+  }
+  return data.choices[0].message.content.trim();
+},
     body: JSON.stringify({
       model: "mistralai/mistral-7b-instruct",
       messages: [
