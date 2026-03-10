@@ -1,4 +1,4 @@
-import { AgentRuntime, ModelProviderName } from "@elizaos/core";
+import { AgentRuntime } from "@elizaos/core";
 import { TwitterClientInterface } from "@elizaos/plugin-twitter";
 import { createRequire } from "module";
 
@@ -7,8 +7,8 @@ const knafo = require("../characters/knafo_xbt.character.json");
 
 const runtime = new AgentRuntime({
   character: knafo,
-  modelProvider: ModelProviderName.OPENROUTER,
   token: process.env.OPENROUTER_API_KEY,
+  modelProvider: "openrouter",
 });
 
 const twitter = await TwitterClientInterface.start(runtime);
