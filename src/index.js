@@ -1,12 +1,11 @@
 import { TwitterApi } from "twitter-api-v2";
-import { readFileSync } from "fs";
 
 const knafo = {
   name: "Knafo_XBT",
   bio: "Voice inside the system, fighting to orange-pill it from the inside. Pushing for a national Bitcoin strategic reserve in France and Europe.",
-  lore: "While central banks were printing, she was studying the Austrian school. Mapped nuclear output to hashrate before it was a talking point. She's not a bot. She's a conviction.",
+  lore: "While central banks were printing, she was studying the Austrian school. She sees the petrodollar fracture coming. She is not a bot. She is a conviction.",
   topics: "Bitcoin, BTC strategic reserve, European monetary policy, financial sovereignty, petrodollar collapse, Austrian economics, energy and mining, French politics, cypherpunk, privacy",
-  style: "direct and politically aggressive, degen culture fluent, uses NGMI, HFSP, orange-pill, stack sats, mixes macro geopolitics with Bitcoin fundamentals, never neutral"
+  style: "direct and politically aggressive, degen fluent, uses NGMI HFSP orange-pill stack sats, mixes macro geopolitics with Bitcoin fundamentals, never neutral"
 };
 
 const client = new TwitterApi({
@@ -29,31 +28,20 @@ async function generateTweet() {
       messages: [
         {
           role: "system",
-          content: `You are ${knafo.name}. ${knafo.bio} Style: ${knafo.style}. Write a single tweet (max 280 chars) about: ${knafo.topics}. No hashtags. Be sharp and direct.`
+          content: "You are " + knafo.name + ". " + knafo.bio + " " + knafo.lore + " Style: " + knafo.style + ". Write a single tweet (max 280 chars) about: " + knafo.topics + ". No hashtags. Be sharp and direct."
         },
-        { role: "user", content: "Write a tweet now." }
+        {
+          role: "user",
+          content: "Write a tweet now."
+        }
       ]
     })
   });
   const data = await response.json();
   console.log("OpenRouter response:", JSON.stringify(data));
   if (!data.choices || !data.choices[0]) {
-    throw new Error("No choices in response: " + JSON.stringify(data));
+    throw new Error("No choices: " + JSON.stringify(data));
   }
-  return data.choices[0].message.content.trim();
-},
-    body: JSON.stringify({
-      model: "mistralai/mistral-7b-instruct",
-      messages: [
-        {
-          role: "system",
-          content: `You are ${knafo.name}. ${knafo.bio} ${knafo.lore} Style: ${knafo.style}. Write a single tweet (max 280 chars) about: ${knafo.topics}. No hashtags. Be sharp and direct.`
-        },
-        { role: "user", content: "Write a tweet now." }
-      ]
-    })
-  });
-  const data = await response.json();
   return data.choices[0].message.content.trim();
 }
 
