@@ -6,7 +6,7 @@
     "start": "node src/index.js"
   },
   "dependencies": {
-    "twitter-api-v2": "^1.17.0",
+    "agent-twitter-client": "^0.0.19",
     "node-fetch": "^3.3.2"
   }
 }
