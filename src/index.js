@@ -24,7 +24,7 @@ async function generateTweet() {
       "HTTP-Referer": "https://knafo.fun"
     },
     body: JSON.stringify({
-      model: "openai/gpt-oss-20b:free",
+      model: "mistralai/mistral-small-creative",
       messages: [
         {
           role: "system",
