@@ -1,8 +1,10 @@
 import { TwitterApi } from "twitter-api-v2";
-import { createRequire } from "module";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
-const require = createRequire(import.meta.url);
-const knafo = require("../characters/knafo_xbt.character.json");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const knafo = JSON.parse(readFileSync(join(__dirname, "../characters/knafo_xbt.character.json"), "utf8"));
 
 const client = new TwitterApi({
   appKey: process.env.TWITTER_API_KEY,
