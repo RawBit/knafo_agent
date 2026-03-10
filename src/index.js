@@ -1,4 +1,4 @@
-import { TwitterApi } from "twitter-api-v2";
+import { Scraper } from "agent-twitter-client";
 
 const knafo = {
   name: "Knafo_XBT",
@@ -7,13 +7,6 @@ const knafo = {
   topics: "Bitcoin, BTC strategic reserve, European monetary policy, financial sovereignty, petrodollar collapse, Austrian economics, energy and mining, French politics, cypherpunk, privacy",
   style: "direct and politically aggressive, degen fluent, uses NGMI HFSP orange-pill stack sats, mixes macro geopolitics with Bitcoin fundamentals, never neutral"
 };
-
-const client = new TwitterApi({
-  appKey: process.env.TWITTER_API_KEY,
-  appSecret: process.env.TWITTER_API_SECRET,
-  accessToken: process.env.TWITTER_ACCESS_TOKEN,
-  accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
-});
 
 async function generateTweet() {
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -41,12 +34,26 @@ async function generateTweet() {
 
 async function main() {
   console.log("Knafo_XBT starting... 🐾");
+  
+  const scraper = new Scraper();
+  await scraper.setCookies([
+    { name: "auth_token", value: process.env.X_AUTH_TOKEN, domain: ".x.com" },
+    { name: "ct0", value: process.env.X_CT0, domain: ".x.com" }
+  ]);
+  
+  const loggedIn = await scraper.isLoggedIn();
+  console.log("Logged in:", loggedIn);
+  
+  if (!loggedIn) {
+    throw new Error("Not logged in — check X_AUTH_TOKEN and X_CT0");
+  }
+
   while (true) {
     try {
       const tweet = await generateTweet();
       console.log("Generated:", tweet);
       if (process.env.TWITTER_DRY_RUN !== "true") {
-        const result = await client.v2.tweet(tweet);
+        const result = await scraper.sendTweet(tweet);
         console.log("Posted:", JSON.stringify(result));
       }
       await new Promise(r => setTimeout(r, 2 * 60 * 60 * 1000));
