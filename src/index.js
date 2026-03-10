@@ -24,7 +24,7 @@ async function generateTweet() {
       "HTTP-Referer": "https://knafo.fun"
     },
     body: JSON.stringify({
-      model: "mistralai/mistral-small",
+      model: "google/gemma-3n-e4b-it:free",
       messages: [
         {
           role: "system",
